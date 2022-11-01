@@ -265,7 +265,7 @@ function ShowDetail({
 	showId,
 	sliderId = "",
 	passedShowData,
-	from = "",
+	from = "show",
 }: IShowDetailProps) {
 	const navigate = useNavigate();
 
