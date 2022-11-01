@@ -1,8 +1,9 @@
 import styled from "styled-components";
-import { useState, useEffect, useRef } from "react";
-import { Link, useMatch } from "react-router-dom";
-import { motion, useAnimation, useScroll } from "framer-motion";
+import { useState } from "react";
+import { Link, useMatch, useNavigate } from "react-router-dom";
+import { motion, MotionValue, useAnimation } from "framer-motion";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { useForm } from "react-hook-form";
 
 const Navigation = styled(motion.nav)`
 	display: flex;
@@ -12,7 +13,9 @@ const Navigation = styled(motion.nav)`
 	width: 100%;
 	height: 5rem;
 	top: 0;
+	left: 0;
 	color: ${(props) => props.theme.white.light};
+	z-index: 1;
 
 	& > *:first-child {
 		margin-left: 3rem;
@@ -30,6 +33,7 @@ const Column = styled.div`
 
 const Logo = styled(motion.svg)`
 	width: 8rem;
+	margin-top: 0.5rem;
 	fill: ${(props) => props.theme.red};
 `;
 
@@ -39,6 +43,7 @@ const Item = styled.li`
 	justify-content: center;
 	flex-direction: column;
 	color: ${(props) => props.theme.white.light};
+	transition: color 0.3s;
 `;
 
 const Indicator = styled(motion.span)`
@@ -66,16 +71,18 @@ const Items = styled.ul`
 	}
 `;
 
-const Search = styled.div`
+const Search = styled.form`
 	display: flex;
 	align-items: center;
 	position: relative;
+	cursor: pointer;
 `;
 
 const Input = styled(motion.input)`
 	transform-origin: right center;
 	position: absolute;
 	right: 0px;
+	width: 14rem;
 	padding: 0.6rem 0.6rem 0.6rem 2.2rem;
 	z-index: -1;
 	border: none;
@@ -85,51 +92,43 @@ const Input = styled(motion.input)`
 
 const SearchIcon = motion(SearchRoundedIcon);
 
-const navigationVariants = {
-	top: {
-		backgroundColor: "rgba(0, 0, 0, 0)",
-	},
-	scroll: {
-		backgroundColor: "rgba(0, 0, 0, 1)",
-	},
-};
+interface ISearchForm {
+	keyword: string;
+}
 
-function Header() {
+function Header({
+	headerBackground,
+}: {
+	headerBackground: MotionValue<string>;
+}) {
 	const homeMatch = useMatch("/");
-	const tvMatch = useMatch("/tv");
+	const tvMatch = useMatch("/show");
 
-	const searchInputRef = useRef<HTMLInputElement>(null);
+	const navigate = useNavigate();
 
-	const [searchOpen, setSearchOpen] = useState(false);
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
 
 	const inputAnimation = useAnimation();
-	const navigationAnimation = useAnimation();
 
-	const { scrollY } = useScroll();
+	const { register, handleSubmit, setFocus } = useForm<ISearchForm>();
+	const onValid = (data: ISearchForm) => {
+		navigate(`/search?keyword=${data.keyword}`);
+		toggleSearch();
+	};
 
 	const toggleSearch = () => {
-		if (searchOpen) {
+		if (isSearchOpen) {
 			inputAnimation.start({ scaleX: 0, scaleY: 0 });
 		} else {
 			inputAnimation.start({ scaleX: 1, scaleY: 1 });
-			searchInputRef.current && searchInputRef.current.focus();
+			setFocus("keyword");
 		}
 
-		setSearchOpen((prev) => !prev);
+		setIsSearchOpen((prev) => !prev);
 	};
 
-	useEffect(() => {
-		scrollY.onChange((y) => {
-			if (y > 80) {
-				navigationAnimation.start("scroll");
-			} else {
-				navigationAnimation.start("top");
-			}
-		});
-	}, [scrollY, navigationAnimation]);
-
 	return (
-		<Navigation variants={navigationVariants} animate={navigationAnimation} initial="top">
+		<Navigation initial="top" style={{ background: headerBackground }}>
 			<Column>
 				<Link to="/">
 					<Logo xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 276.742">
@@ -142,30 +141,34 @@ function Header() {
 				<Items>
 					<Item>
 						<Link to="/">
-							Home
-							{homeMatch && <Indicator layoutId="indicator" />}
+							홈{homeMatch && <Indicator layoutId="indicator" />}
 						</Link>
 					</Item>
-					<Link to="tv">
+					<Link to="show">
 						<Item>
-							TV Shows
-							{tvMatch && <Indicator layoutId="indicator" />}
+							TV 프로그램{tvMatch && <Indicator layoutId="indicator" />}
 						</Item>
 					</Link>
 				</Items>
 			</Column>
-			<Search>
+			<Search onSubmit={handleSubmit(onValid)}>
 				<SearchIcon
 					onClick={toggleSearch}
-					animate={{ x: searchOpen ? "-12rem" : 0, fill: searchOpen ? "#000000" : "#ffffff" }}
-					transition={{ type: "linear" }}
+					animate={{
+						x: isSearchOpen ? "-12rem" : 0,
+						fill: isSearchOpen ? "#000000" : "#ffffff",
+					}}
+					transition={{ type: "tween" }}
 				/>
 				<Input
-					ref={searchInputRef}
+					{...register("keyword", { required: true, minLength: 2 })}
+					onKeyDown={(event) => {
+						event.key === "Escape" && toggleSearch();
+					}}
 					placeholder="영화나 TV 쇼를 검색해보세요..."
 					initial={{ scaleX: 0 }}
 					animate={inputAnimation}
-					transition={{ type: "linear" }}
+					transition={{ type: "tween" }}
 				/>
 			</Search>
 		</Navigation>
