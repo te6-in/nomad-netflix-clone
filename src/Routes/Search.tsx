@@ -121,12 +121,11 @@ const GoToTop = styled.button`
 
 function Search() {
 	const location = useLocation();
-	const keyword =
-		new URLSearchParams(location.search).get("keyword") ||
-		(location.state as { keyword: string }).keyword ||
-		"";
+	const keyword = new URLSearchParams(location.search).get("keyword") || "";
+	const type = new URLSearchParams(location.search).get("type") || "";
+	const id = new URLSearchParams(location.search).get("id") || "";
+
 	const navigate = useNavigate();
-	const match = useMatch("/search/:type/:id");
 
 	const [clickedMovie, setClickedMovie] = useRecoilState(clickedMovieState);
 	const [clickedShow, setClickedShow] = useRecoilState(clickedShowState);
@@ -138,10 +137,10 @@ function Search() {
 	const onContentClick = (content: IMovie | IShow) => {
 		if (isMovie(content)) {
 			setClickedMovie(content);
-			navigate(`/search/movie/${content.id}`, { state: { keyword } });
+			navigate(`/search?keyword=${keyword}&type=movie&id=${content.id}`);
 		} else {
 			setClickedShow(content);
-			navigate(`/search/show/${content.id}`, { state: { keyword } });
+			navigate(`/search?keyword=${keyword}&type=show&id=${content.id}`);
 		}
 	};
 
@@ -150,10 +149,10 @@ function Search() {
 	};
 
 	useEffect(() => {
-		match
+		type && id
 			? (document.body.style.overflowY = "hidden")
 			: (document.body.style.overflowY = "auto");
-	}, [match]);
+	}, [type, id]);
 
 	const { data: movieSearch, isLoading: isMovieSearchLoading } =
 		useQuery<IDefaultMoviesResult>(
@@ -245,44 +244,38 @@ function Search() {
 						</Container>
 					</AnimatePresence>
 					<AnimatePresence>
-						{match &&
-							match.params &&
-							match.params.type === "movie" &&
-							match.params.id && (
-								<>
-									<Overlay
-										onClick={onOverlayClick}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-									/>
-									<MovieDetail
-										sliderId={"search-movie"}
-										movieId={+match.params.id}
-										passedMovieData={clickedMovie!}
-										from={`search?keyword=${keyword}`}
-									/>
-								</>
-							)}
+						{type === "movie" && id && (
+							<>
+								<Overlay
+									onClick={onOverlayClick}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+								/>
+								<MovieDetail
+									sliderId={"search-movie"}
+									movieId={+id}
+									passedMovieData={clickedMovie!}
+									from={`search?keyword=${keyword}`}
+								/>
+							</>
+						)}
 					</AnimatePresence>
 					<AnimatePresence>
-						{match &&
-							match.params &&
-							match.params.type === "show" &&
-							match.params.id && (
-								<>
-									<Overlay
-										onClick={onOverlayClick}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-									/>
-									<ShowDetail
-										sliderId={"search-show"}
-										showId={+match.params.id}
-										passedShowData={clickedShow!}
-										from={`search?keyword=${keyword}`}
-									/>
-								</>
-							)}
+						{type === "show" && id && (
+							<>
+								<Overlay
+									onClick={onOverlayClick}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+								/>
+								<ShowDetail
+									sliderId={"search-show"}
+									showId={+id}
+									passedShowData={clickedShow!}
+									from={`search?keyword=${keyword}`}
+								/>
+							</>
+						)}
 					</AnimatePresence>
 					<GoToTop onClick={onScrollToTopClick}>
 						맨 위로 올라가기

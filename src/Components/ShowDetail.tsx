@@ -338,13 +338,11 @@ function ShowDetail({
 						? showDetail.name
 						: ""}
 				</BigTitle>
-				{isShowDetailLoading || !showDetail ? (
-					<Loader>로딩 중...</Loader>
-				) : (
+				{!isShowDetailLoading && showDetail && (
 					<>
-						{showDetail.tagline ? (
+						{showDetail.tagline && (
 							<SmallTitle>{showDetail.tagline}</SmallTitle>
-						) : null}
+						)}
 						<Genres>
 							{showDetail.genres &&
 								showDetail.genres.map((genre) => (

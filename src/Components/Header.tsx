@@ -18,10 +18,10 @@ const Navigation = styled(motion.nav)`
 	z-index: 1;
 
 	& > *:first-child {
-		margin-left: 3rem;
+		margin-left: 8vw;
 	}
 	& > *:last-child {
-		margin-right: 3rem;
+		margin-right: 8vw;
 	}
 `;
 

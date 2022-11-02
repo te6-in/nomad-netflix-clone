@@ -340,13 +340,11 @@ function MovieDetail({
 						? movieDetail.title
 						: ""}
 				</BigTitle>
-				{isMovieDetailLoading || !movieDetail ? (
-					<Loader>로딩 중...</Loader>
-				) : (
+				{!isMovieDetailLoading && movieDetail && (
 					<>
-						{movieDetail.tagline ? (
+						{movieDetail.tagline && (
 							<SmallTitle>{movieDetail.tagline}</SmallTitle>
-						) : null}
+						)}
 						<Genres>
 							{movieDetail.genres &&
 								movieDetail.genres.map((genre) => (

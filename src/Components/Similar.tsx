@@ -72,9 +72,7 @@ function Similar({ type, title, id, backdropPath, from = "" }: ISimilarProps) {
 		setClickedMovieState(null);
 		setClickedShowState(null);
 		if (from.startsWith("search")) {
-			navigate(`/${from.split("?")[0]}/${type}/${id}`, {
-				state: { keyword: from.split("?")[1].split("keyword=")[1] },
-			});
+			navigate(`/${from}&type=${type}&id=${id}`);
 		} else {
 			navigate(`/${type}/${id}`);
 		}
