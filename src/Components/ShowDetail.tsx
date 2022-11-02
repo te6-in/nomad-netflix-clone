@@ -11,7 +11,6 @@ import {
 	getSimilarShows,
 } from "../api";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
