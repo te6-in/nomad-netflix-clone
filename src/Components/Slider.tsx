@@ -83,7 +83,6 @@ const Box = styled(motion.div)`
 	border-radius: 0.75rem;
 	box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
 	cursor: pointer;
-	position: relative;
 
 	& > img {
 		width: 100%;
